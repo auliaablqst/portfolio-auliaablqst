@@ -1,0 +1,523 @@
+"use client"
+
+import { motion } from "framer-motion"
+import { useState, useEffect } from "react"
+import { GlassCard } from "@/components/GlassCard"
+import { SectionLabel } from "@/components/SectionLabel"
+
+export default function Home() {
+  const [scrollProgress, setScrollProgress] = useState(0)
+  const [typingText, setTypingText] = useState('')
+  const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
+  const [isTyping, setIsTyping] = useState(true)
+  const [showCursor, setShowCursor] = useState(true)
+
+  const roles = [
+    'UI/UX Enthusiast',
+    'Business Analyst',
+    'Web Developer',
+    'Problem Solver'
+  ]
+
+  // Typing animation
+  useEffect(() => {
+    const currentRole = roles[currentRoleIndex]
+    if (isTyping) {
+      if (typingText.length < currentRole.length) {
+        const timeout = setTimeout(() => {
+          setTypingText(currentRole.slice(0, typingText.length + 1))
+        }, 100)
+        return () => clearTimeout(timeout)
+      } else {
+        const timeout = setTimeout(() => {
+          setIsTyping(false)
+        }, 2000)
+        return () => clearTimeout(timeout)
+      }
+    } else {
+      if (typingText.length > 0) {
+        const timeout = setTimeout(() => {
+          setTypingText(typingText.slice(0, -1))
+        }, 50)
+        return () => clearTimeout(timeout)
+      } else {
+        setCurrentRoleIndex(prev => (prev + 1) % roles.length)
+        setIsTyping(true)
+      }
+    }
+  }, [typingText, isTyping, currentRoleIndex])
+
+  // Cursor blinking
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowCursor(prev => !prev)
+    }, 500)
+    return () => clearInterval(interval)
+
+  // Scroll progress
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight
+      const progress = (window.scrollY / totalHeight) * 100
+      setScrollProgress(progress)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0 },
+  }
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  }
+
+  const experiences = [
+    {
+      period: '2023 — Sekarang',
+      role: 'Ketua Divisi IT',
+      organization: 'Himpunan Mahasiswa Sistem Informasi Bisnis',
+      description: 'Memimpin pengembangan sistem informasi dan teknologi untuk organisasi mahasiswa, mengkoordinasi proyek digital dan event teknologi.',
+      tags: ['Leadership', 'Event Management', 'System Development'],
+      side: 'left'
+    },
+    {
+      period: '2022 — 2023',
+      role: 'Anggota Divisi Media & IT',
+      organization: 'UKM Robotika Polinema',
+      description: 'Bertanggung jawab atas dokumentasi kegiatan, pengembangan website organisasi, dan dukungan teknis untuk kompetisi robotika.',
+      tags: ['Web Development', 'Documentation', 'Technical Support'],
+      side: 'right'
+    },
+    {
+      period: '2021 — 2022',
+      role: 'Panitia Event',
+      organization: 'Dies Natalis Polinema',
+      description: 'Berpartisipasi dalam perencanaan dan eksekusi acara tahunan, fokus pada koordinasi teknis dan manajemen data peserta.',
+      tags: ['Event Planning', 'Data Management', 'Coordination'],
+      side: 'left'
+    }
+  ]
+
+  const [projectFilter, setProjectFilter] = useState('Semua')
+  const filters = ['Semua', 'Web App', 'Dashboard', 'UI/UX']
+
+  const filteredProjects = projectFilter === 'Semua' 
+    ? PROJECTS_CONTENT 
+    : PROJECTS_CONTENT.filter(project => project.category === projectFilter)
+
+  return (
+    <div className="min-h-screen">
+      {/* Scroll Progress Bar */}
+      <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-2)] z-50" 
+           style={{ width: `${scrollProgress}%` }} />
+
+      {/* Hero Section */}
+      <section id="hero" className="min-h-screen flex items-center justify-center px-6 py-32">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="text-center max-w-4xl mx-auto"
+        >
+          <SectionLabel label="Halo, saya" />
+          <motion.h1
+            className="text-6xl md:text-8xl font-bold mb-6 text-balance"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, delay: 0.2, type: "spring", damping: 10 }}
+          >
+            <span className="text-[var(--text)]">Hello, I&apos;m</span>
+            <br />
+            <span className="text-[var(--accent)] font-800">Aulia Bilqisty</span>
+          </motion.h1>
+
+          <motion.div
+            className="text-xl md:text-2xl text-[var(--accent)] mb-4 h-8 flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.6 }}
+          >
+            {typingText}{showCursor ? '|' : ' '}
+          </motion.div>
+
+          <motion.p
+            className="text-lg text-[var(--text-muted)] mb-12 max-w-2xl mx-auto text-balance leading-relaxed"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.8 }}
+          >
+            Mahasiswa Sistem Informasi Bisnis Polinema yang passionate di persimpangan antara teknologi, desain, dan strategi bisnis. Saya percaya sistem yang baik bukan hanya tentang kode — tapi tentang dampak nyata bagi penggunanya.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <motion.a
+              href="#projects"
+              className="px-8 py-4 bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-2)] transition-colors font-medium"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onMouseMove={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect()
+                const x = e.clientX - rect.left - rect.width / 2
+                const y = e.clientY - rect.top - rect.height / 2
+                e.currentTarget.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translate(0px, 0px)'
+              }}
+            >
+              {HERO_CONTENT.cta}
+            </motion.a>
+            <a
+              href="#contact"
+              className="px-8 py-4 border border-[var(--accent)] text-[var(--accent)] rounded-lg hover:bg-[var(--accent)] hover:text-white transition-colors font-medium"
+            >
+              Get In Touch
+            </a>
+          </motion.div>
+
+          {/* Scroll Indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+          >
+            <div className="w-6 h-10 border-2 border-[var(--accent)] rounded-full flex justify-center">
+              <motion.div
+                animate={{ y: [0, 12, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="w-1 h-3 bg-[var(--accent)] rounded-full mt-2"
+              />
+            </div>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* About Section - 3 Column Layout */}
+      <section id="about" className="py-32 px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="max-w-7xl mx-auto"
+        >
+          <SectionLabel label="About Me" />
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr auto 1fr',
+            gap: '4rem',
+            alignItems: 'center'
+          }}>
+            {/* Left Text */}
+            <div className="text-right">
+              <p className="text-[var(--text-muted)] font-400 leading-9 mb-6">
+                Saya berasal dari Malang, seorang mahasiswa semester 6 di Politeknik Negeri Malang jurusan Sistem Informasi Bisnis.
+              </p>
+              <p className="text-[var(--text-muted)] font-400 leading-9">
+                Perjalanan saya di dunia teknologi dimulai dari rasa penasaran tentang bagaimana sebuah sistem bisa mengubah cara bisnis bekerja.
+              </p>
+            </div>
+
+            {/* Center Photo */}
+            <div className="relative">
+              <motion.div
+                className="w-56 h-56 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-2)] p-1"
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <div className="w-full h-full rounded-full bg-[var(--card-bg)] border-2 border-[var(--glass-border)] flex items-center justify-center">
+                  <span className="text-4xl font-800 text-[var(--accent)]">AB</span>
+                </div>
+              </motion.div>
+              {/* Rotating Ring */}
+              <motion.div
+                className="absolute inset-0 rounded-full border-2 border-dashed border-[var(--accent)] opacity-30"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              />
+              {/* Badge */}
+              <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-[var(--glass)] border border-[var(--glass-border)] rounded-full px-4 py-2 backdrop-blur-sm">
+                <span className="text-sm font-500 text-[var(--text)]">Polinema · SIB</span>
+              </div>
+            </div>
+
+            {/* Right Text */}
+            <div className="text-left">
+              <p className="text-[var(--text-muted)] font-400 leading-9 mb-6">
+                Saya sangat tertarik pada UI/UX Design, Business Intelligence, dan pengembangan aplikasi web yang berorientasi pada pengguna.
+              </p>
+              <p className="text-[var(--text-muted)] font-400 leading-9">
+                Ke depan, saya ingin berkontribusi pada organisasi yang menggunakan teknologi sebagai alat untuk memecahkan masalah bisnis yang nyata.
+              </p>
+            </div>
+          </div>
+
+          {/* Stats Cards */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="grid grid-cols-3 gap-6 mt-16 max-w-2xl mx-auto"
+          >
+            {[
+              { number: '3+', label: 'Tahun Belajar' },
+              { number: '8+', label: 'Proyek' },
+              { number: '∞', label: 'Semangat' }
+            ].map((stat) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="text-center"
+              >
+                <GlassCard className="p-6">
+                  <div className="text-3xl font-700 text-[var(--accent)] mb-2">{stat.number}</div>
+                  <div className="text-sm text-[var(--text-muted)] font-500 uppercase tracking-wider">{stat.label}</div>
+                </GlassCard>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* Experience Section */}
+      <section id="experience" className="py-32 px-6 bg-[var(--bg2)]">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="max-w-6xl mx-auto"
+        >
+          <SectionLabel label="Pengalaman Organisasi" />
+          
+          <div className="relative">
+            {/* Timeline Line */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-[var(--accent)] to-transparent"></div>
+            
+            {experiences.map((exp) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: exp.side === 'left' ? -40 : 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.15 }}
+                className={`flex items-center mb-16 ${exp.side === 'left' ? 'justify-start' : 'justify-end'}`}
+              >
+                <div className={`w-5/12 ${exp.side === 'left' ? 'pr-8 text-right' : 'pl-8 text-left'}`}>
+                  <GlassCard className="p-6 relative">
+                    <div className="text-sm font-500 text-[var(--accent)] uppercase tracking-wider mb-2">{exp.period}</div>
+                    <h3 className="text-xl font-700 text-[var(--text)] mb-2">{exp.role}</h3>
+                    <div className="text-[var(--text-muted)] font-500 mb-4 flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm3 1h6v2H7V5zm0 4h6v2H7V9z" clipRule="evenodd" />
+                      </svg>
+                      {exp.organization}
+                    </div>
+                    <p className="text-[var(--text-muted)] font-400 mb-4">{exp.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {exp.tags.map(tag => (
+                        <span key={tag} className="px-3 py-1 bg-[var(--glass)] border border-[var(--glass-border)] rounded-full text-xs font-500 text-[var(--accent)]">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </GlassCard>
+                </div>
+                
+                {/* Timeline Dot */}
+                <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-[var(--accent)] rounded-full border-4 border-[var(--bg)]">
+                  <motion.div
+                    className="absolute inset-0 rounded-full bg-[var(--accent)]"
+                    animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Skills Section */}
+      <section id="skills" className="py-32 px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          viewport={{ once: true }}
+          className="max-w-6xl mx-auto"
+        >
+          <SectionLabel label="Skills & Expertise" />
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
+          >
+            {[
+              { icon: "📊", name: "Business Intelligence", tags: ["Power BI", "Tableau", "Excel"] },
+              { icon: "🧠", name: "Data Science", tags: ["Python", "Pandas", "Scikit-learn"] },
+              { icon: "💻", name: "Web Development", tags: ["React", "Next.js", "TypeScript"] },
+              { icon: "🎨", name: "UI/UX Design", tags: ["Figma", "Prototyping"] }
+            ].map((skill, index) => (
+              <motion.div
+                key={skill.name}
+                variants={cardVariants}
+                whileHover={{ y: -6, boxShadow: '0 20px 40px rgba(124,58,237,0.12)' }}
+                transition={{ duration: 0.2 }}
+                className="group"
+              >
+                <GlassCard className="h-full group-hover:border-[var(--accent)]/50 transition-all duration-300 relative">
+                  <div className="absolute -top-1 left-0 right-0 h-1 bg-[var(--accent)] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                  <div className="text-4xl mb-4">{skill.icon}</div>
+                  <h3 className="text-xl font-600 text-[var(--text)] mb-4">{skill.name}</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {skill.tags.map(tag => (
+                      <span key={tag} className="px-3 py-1 bg-[var(--glass)] border border-[var(--glass-border)] text-[var(--accent)] rounded-full text-xs font-500">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </GlassCard>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* Projects Section */}
+      <section id="projects" className="py-32 px-6 bg-[var(--bg2)]">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          viewport={{ once: true }}
+          className="max-w-6xl mx-auto"
+        >
+          <SectionLabel label="Featured Projects" />
+          
+          {/* Filter Tabs */}
+          <div className="flex justify-center mb-12">
+            <div className="flex gap-2 p-1 bg-[var(--card-bg)] border border-[var(--glass-border)] rounded-lg backdrop-blur-sm">
+              {filters.map(filter => (
+                <button
+                  key={filter}
+                  onClick={() => setProjectFilter(filter)}
+                  className={`px-6 py-2 rounded-md text-sm font-500 transition-all ${
+                    projectFilter === filter 
+                      ? 'bg-[var(--accent)] text-white' 
+                      : 'text-[var(--text-muted)] hover:text-[var(--text)]'
+                  }`}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <motion.div
+            layout
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="contents"
+            >
+              {filteredProjects.map((project, index) => (
+                <motion.div
+                  key={project.title}
+                  layout
+                  variants={cardVariants}
+                  whileHover={{ y: -6, boxShadow: '0 20px 40px rgba(124,58,237,0.12)' }}
+                  transition={{ duration: 0.2 }}
+                  className="group"
+                >
+                  <GlassCard className="h-full group-hover:border-[var(--accent)]/50 transition-all duration-300 relative overflow-hidden">
+                    <div className="absolute -top-1 left-0 right-0 h-1 bg-[var(--accent)] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                    <div className="text-4xl mb-4">{project.icon}</div>
+                    <h3 className="text-xl font-600 text-[var(--text)] mb-2">{project.title}</h3>
+                    <p className="text-[var(--text-muted)] font-400 mb-4">{project.description}</p>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {project.tags.map(tag => (
+                        <span key={tag} className="px-3 py-1 bg-[var(--glass)] border border-[var(--glass-border)] text-[var(--accent)] rounded-full text-xs font-500">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex gap-3">
+                      {project.demo && (
+                        <a href={project.demo} className="text-[var(--accent)] hover:text-[var(--accent-2)] transition-colors text-sm font-500">
+                          Live Demo →
+                        </a>
+                      )}
+                      {project.github && (
+                        <a href={project.github} className="text-[var(--text-muted)] hover:text-[var(--text)] transition-colors text-sm font-500">
+                          GitHub →
+                        </a>
+                      )}
+                    </div>
+                  </GlassCard>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-32 px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          viewport={{ once: true }}
+          className="max-w-4xl mx-auto text-center"
+        >
+          <SectionLabel label="Get In Touch" />
+          <h2 className="text-4xl font-700 text-[var(--text)] mb-6">Let&apos;s Work Together</h2>
+          <p className="text-[var(--text-muted)] font-400 mb-12 max-w-2xl mx-auto">
+            Interested in collaborating on business intelligence projects, web development, or UI/UX design? Let&apos;s connect!
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <motion.button
+              onClick={() => {
+                navigator.clipboard.writeText('aulia.bilqisty@email.com')
+                // Toast notification would go here
+                alert('Email tersalin! 📋')
+              }}
+              className="px-8 py-4 bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-2)] transition-colors font-medium"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              📧 Copy Email
+            </motion.button>
+            <a
+              href="https://linkedin.com/in/auliabilqisty"
+              className="px-8 py-4 border border-[var(--accent)] text-[var(--accent)] rounded-lg hover:bg-[var(--accent)] hover:text-white transition-colors font-medium"
+            >
+              💼 LinkedIn
+            </a>
+          </div>
+        </motion.div>
+      </section>
+    </div>
+  )
+}

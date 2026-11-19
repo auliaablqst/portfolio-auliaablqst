@@ -1,216 +1,164 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
-import { ArrowRight, Mail, MapPin } from "lucide-react"
-import { SITE_CONFIG } from "@/constants"
+import { useEffect, useState, useRef } from "react"
+import { motion, useMotionValue, useSpring } from "framer-motion"
+import { ArrowRight, Mail, MapPin, Play, ExternalLink } from "lucide-react"
+import {
+  HERO_CONTENT,
+  ABOUT_CONTENT,
+  SECTION_HEADINGS,
+  PROJECTS_CONTENT,
+  EXPERIENCE_CONTENT,
+  SKILLS_CONTENT,
+  CREATIVE_CONTENT,
+  CONTACT_CONTENT,
+  ProjectItem,
+} from "@/constants"
 import {
   ExperienceTimeline,
   MetricTile,
   SectionHeading,
   SkillBadgeGrid,
-} from "../components/PortfolioShowcase"
+} from "@/components/PortfolioShowcase"
 import { useToast } from "@/components/ToastProvider"
-import { cn } from "@/lib/utils"
+import { MagneticButton } from "@/components/MagneticButton"
+import { PlaceholderImage } from "@/components/PlaceholderImage"
+import { ViewfinderCarousel } from "@/components/ViewfinderCarousel"
 
-type ProjectCard = {
-  title: string
-  category: string
-  year: string
-  description: string
-  tags: string[]
-  accent: "purple" | "teal" | "amber"
-  size: "large" | "small"
-  highlights: string[]
-}
+// Card dengan efek 3D tilt halus yang merespons posisi mouse
+function TiltProjectCard({ project }: Readonly<{ project: ProjectItem }>) {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const springConfig = { damping: 25, stiffness: 300 }
+  const rawRotateX = useMotionValue(0)
+  const rawRotateY = useMotionValue(0)
+  const rotateX = useSpring(rawRotateX, springConfig)
+  const rotateY = useSpring(rawRotateY, springConfig)
 
-const heroMetrics = [
-  { value: "6+", label: "selected projects" },
-  { value: "3+", label: "years learning" },
-  { value: "4", label: "core disciplines" },
-]
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return
+    const rect = cardRef.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    const offsetX = (e.clientX - centerX) / (rect.width / 2)
+    const offsetY = (e.clientY - centerY) / (rect.height / 2)
 
-const featuredProjects: ProjectCard[] = [
-  {
-    title: "Customer Segmentation Analysis",
-    category: "Data Science",
-    year: "2024",
-    description:
-      "Analisis segmentasi pelanggan untuk menemukan pola pembelian dan mendukung strategi marketing yang lebih presisi.",
-    tags: ["Python", "Scikit-learn", "Pandas"],
-    accent: "purple",
-    size: "large",
-    highlights: ["K-Means clustering", "Behavior mapping", "Marketing segmentation"],
-  },
-  {
-    title: "E-Commerce Dashboard",
-    category: "Business Intelligence",
-    year: "2024",
-    description:
-      "Dashboard interaktif untuk memantau penjualan, inventory, dan customer behavior dengan tampilan yang clean.",
-    tags: ["Power BI", "Analytics", "Reporting"],
-    accent: "teal",
-    size: "small",
-    highlights: ["Live KPI cards", "Revenue trends", "Inventory heatmap"],
-  },
-  {
-    title: "UX Design System",
-    category: "Design Systems",
-    year: "2023",
-    description:
-      "System visual yang menjaga konsistensi komponen, spacing, dan hierarchy untuk UI yang terasa premium.",
-    tags: ["Figma", "Design Tokens", "UI/UX"],
-    accent: "amber",
-    size: "small",
-    highlights: ["Color tokens", "Reusable patterns", "Responsive layouts"],
-  },
-]
+    rawRotateX.set(-offsetY * 4) // max 4 deg
+    rawRotateY.set(offsetX * 4)
+  }
 
-const experienceItems = [
-  {
-    period: "2023 - Present",
-    role: "Ketua Divisi IT",
-    organization: "Himpunan Mahasiswa Sistem Informasi Bisnis",
-    summary:
-      "Memimpin inisiatif digital, mengatur alur kerja teknis, dan mendukung kebutuhan sistem untuk kegiatan organisasi.",
-    highlights: ["Leadership", "Digital Ops", "System Support"],
-    tone: "indigo" as const,
-  },
-  {
-    period: "2022 - 2023",
-    role: "Anggota Media & IT",
-    organization: "UKM Robotika Polinema",
-    summary:
-      "Berkontribusi pada dokumentasi, pengelolaan aset digital, dan dukungan teknis untuk kegiatan komunitas.",
-    highlights: ["Documentation", "Web Support", "Content Production"],
-    tone: "amber" as const,
-  },
-]
-
-const skillGroups = [
-  {
-    category: "Data Science",
-    tone: "indigo" as const,
-    items: ["Python", "Pandas", "Scikit-learn", "SQL"],
-  },
-  {
-    category: "Analytics",
-    tone: "amber" as const,
-    items: ["Power BI", "Tableau", "Dashboards", "Insights"],
-  },
-  {
-    category: "Product Design",
-    tone: "emerald" as const,
-    items: ["Figma", "Wireframing", "Systems", "Prototyping"],
-  },
-  {
-    category: "Web Development",
-    tone: "indigo" as const,
-    items: ["Next.js", "TypeScript", "Tailwind", "React"],
-  },
-]
-
-const screenshotSource = "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80"
-
-function ProjectCardBlock({ project }: Readonly<{ project: ProjectCard }>) {
-  const accentStyles = {
-    purple: "bg-[var(--card-dark)] text-white border-[rgba(255,255,255,0.08)]",
-    teal: "bg-[var(--teal-fill)] text-[var(--text)] border-[rgba(29,158,117,0.12)]",
-    amber: "bg-[var(--amber-fill)] text-[var(--text)] border-[rgba(127,119,221,0.08)]",
-  } as const
-
-  const projectFrameStyles = {
-    purple: "bg-[var(--card-dark)] text-white",
-    teal: "bg-[var(--teal-fill)] text-[var(--text)]",
-    amber: "bg-[var(--amber-fill)] text-[var(--text)]",
-  } as const
+  const handleMouseLeave = () => {
+    rawRotateX.set(0)
+    rawRotateY.set(0)
+  }
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.45 }}
-      className="rounded-[2rem]"
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d",
+      }}
+      className="group relative overflow-hidden rounded-2xl md:rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] [box-shadow:var(--glass-highlight),var(--glass-shadow)] backdrop-blur-[var(--glass-blur-mobile)] md:backdrop-blur-[var(--glass-blur)] backdrop-saturate-[180%] transition-all duration-300 hover:[box-shadow:var(--glass-highlight),var(--glass-shadow-hover)]"
     >
-      <div className={cn("overflow-hidden border", project.size === "large" ? "grid gap-0 lg:grid-cols-[1.15fr_0.85fr]" : "grid gap-0 lg:grid-cols-[0.9fr_1.1fr]", projectFrameStyles[project.accent])}>
-        <div className="space-y-5 p-6 sm:p-7">
-          <div className="flex items-center justify-between gap-4 text-xs uppercase tracking-[0.26em] text-current/60">
-            <span>{project.category}</span>
-            <span>{project.year}</span>
-          </div>
-          <div className="space-y-3">
-            <h3 className={project.size === "large" ? "text-3xl font-semibold tracking-tight sm:text-4xl" : "text-2xl font-semibold tracking-tight"}>
+      <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="flex flex-col justify-between p-6 sm:p-8">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-4 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--primary)] dark:text-[#7FA3FF]">
+              <span>{project.category}</span>
+              <span className="rounded-full border border-[var(--primary)]/20 bg-[var(--primary-soft)] px-2.5 py-0.5 text-[10px] font-bold text-[var(--primary)] dark:text-[#7FA3FF]">
+                Featured Case Study
+              </span>
+            </div>
+
+            <h3 className="text-2xl font-extrabold tracking-tight text-[var(--text)] sm:text-3xl text-balance">
               {project.title}
             </h3>
-            <p className={cn("max-w-xl text-sm leading-7", project.accent === "purple" ? "text-white/72" : "text-[var(--text-muted)]")}>{project.description}</p>
+
+            <p className="max-w-xl text-sm leading-relaxed text-[var(--text-muted)] md:text-base">
+              {project.description}
+            </p>
+
+            <div className="flex flex-wrap gap-2 pt-1">
+              {project.tools.map((tool) => (
+                <span
+                  key={tool}
+                  className="rounded-full border border-[var(--border)] bg-[var(--surface-2)] dark:bg-[rgba(255,255,255,0.05)] px-3 py-1 text-[11px] font-medium text-[var(--text)]"
+                >
+                  {tool}
+                </span>
+              ))}
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <span key={tag} className={cn("rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em]", accentStyles[project.accent])}>
-                {tag}
-              </span>
-            ))}
-          </div>
-          <div className="grid gap-2 sm:grid-cols-3">
-            {project.highlights.map((item) => (
-              <div key={item} className={cn("rounded-2xl border px-3 py-3 text-sm", project.accent === "purple" ? "border-white/10 bg-white/5 text-white/80" : "border-[rgba(22,20,31,0.08)] bg-white/55 text-[var(--text)]")}>
-                {item}
-              </div>
-            ))}
+
+          <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface-2)]/60 dark:bg-[rgba(255,255,255,0.03)] p-4 text-sm">
+            <span className="block text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-[var(--primary)] dark:text-[var(--accent-soft)]">
+              Impact & Outcome
+            </span>
+            <span className="mt-1 block font-semibold text-[var(--text)]">{project.outcome}</span>
           </div>
         </div>
 
-        <div className={cn("min-h-[18rem] p-5 sm:p-6", project.accent === "purple" ? "bg-[#0f0d18]" : "bg-white")}>
-          <div className="flex h-full items-center justify-center rounded-[1.5rem] border border-dashed border-current/10 p-4">
-            <div className="w-full max-w-md rounded-[1.5rem] bg-[rgba(255,255,255,0.04)] p-4 shadow-none">
-              <div className="space-y-3 rounded-[1.25rem] bg-current/5 p-4">
-                <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.26em] text-current/55">
-                  <span>Snapshot</span>
-                  <span>Preview</span>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <div className="h-20 rounded-2xl bg-current/10" />
-                  <div className="h-20 rounded-2xl bg-current/15" />
-                  <div className="h-20 rounded-2xl bg-current/10" />
-                </div>
-              </div>
+        <div className="relative flex items-center justify-center p-6 lg:p-8">
+          <PlaceholderImage
+            src={project.image}
+            alt={project.title}
+            aspectRatio="video"
+            label="Interactive Preview"
+            iconName="data"
+            className="w-full"
+          />
+
+          {/* Hover Detail Overlay */}
+          <div className="pointer-events-none absolute inset-6 flex items-center justify-center rounded-2xl bg-[var(--surface)]/90 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 p-6 text-center">
+            <div className="space-y-2">
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--primary)] dark:text-[#7FA3FF]">
+                Lihat Case Study <ExternalLink className="h-3.5 w-3.5" />
+              </span>
+              <p className="text-xs text-[var(--text-muted)]">{project.role}</p>
             </div>
           </div>
         </div>
       </div>
-    </motion.article>
+    </motion.div>
   )
 }
 
-function ProjectMiniCard({ project }: Readonly<{ project: ProjectCard }>) {
-  let cardFill = "bg-[var(--purple-fill)]"
-  if (project.accent === "teal") {
-    cardFill = "bg-[var(--teal-fill)]"
-  } else if (project.accent === "amber") {
-    cardFill = "bg-[var(--amber-fill)]"
-  }
-
+function MiniTiltProjectCard({ project }: Readonly<{ project: ProjectItem }>) {
   return (
     <motion.article
       initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.45 }}
-      className={cn("rounded-[1.6rem] border border-[var(--border-soft)] p-5", cardFill)}
+      className="group flex flex-col justify-between rounded-2xl md:rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-6 [box-shadow:var(--glass-highlight),var(--glass-shadow)] backdrop-blur-[var(--glass-blur-mobile)] md:backdrop-blur-[var(--glass-blur)] backdrop-saturate-[180%] transition-all duration-300 hover:-translate-y-1 hover:[box-shadow:var(--glass-highlight),var(--glass-shadow-hover)]"
     >
-      <div className="flex items-center justify-between gap-4 text-[11px] uppercase tracking-[0.24em] text-[var(--text-muted)]">
-        <span>{project.category}</span>
-        <span>{project.year}</span>
+      <div>
+        <div className="flex items-center justify-between gap-4 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--primary)] dark:text-[#7FA3FF]">
+          <span>{project.category}</span>
+          <span className="text-[11px] font-medium text-[var(--text-dim)]">{project.role}</span>
+        </div>
+        <h3 className="mt-3 text-xl font-bold tracking-tight text-[var(--text)]">{project.title}</h3>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">{project.description}</p>
       </div>
-      <h3 className="mt-4 text-xl font-semibold tracking-tight text-[var(--text)]">{project.title}</h3>
-      <p className="mt-3 text-sm leading-7 text-[var(--text-muted)]">{project.description}</p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {project.tags.map((tag) => (
-          <span key={tag} className="rounded-full border border-[var(--border-soft)] bg-white/60 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--text)]">
-            {tag}
-          </span>
-        ))}
+
+      <div className="mt-5 space-y-4">
+        <div className="flex flex-wrap gap-1.5">
+          {project.tools.map((tool) => (
+            <span
+              key={tool}
+              className="rounded-full border border-[var(--border)] bg-[var(--surface-2)] dark:bg-[rgba(255,255,255,0.05)] px-2.5 py-0.5 text-[11px] font-medium text-[var(--text)]"
+            >
+              {tool}
+            </span>
+          ))}
+        </div>
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)]/60 dark:bg-[rgba(255,255,255,0.03)] px-3.5 py-2 text-xs text-[var(--text-muted)]">
+          <strong className="font-semibold text-[var(--text)]">Outcome: </strong>
+          {project.outcome}
+        </div>
       </div>
     </motion.article>
   )
@@ -218,9 +166,11 @@ function ProjectMiniCard({ project }: Readonly<{ project: ProjectCard }>) {
 
 function ContactDetailCard({ label, value }: Readonly<{ label: string; value: string }>) {
   return (
-    <div className="rounded-[1.4rem] border border-[var(--border-soft)] bg-white p-4">
-      <div className="text-[11px] font-medium uppercase tracking-[0.24em] text-[var(--text-muted)]">{label}</div>
-      <div className="mt-2 text-sm leading-6 text-[var(--text)]">{value}</div>
+    <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-4 [box-shadow:var(--glass-highlight),var(--glass-shadow)] backdrop-blur-md">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-dim)]">
+        {label}
+      </div>
+      <div className="mt-1 text-sm font-semibold leading-relaxed text-[var(--text)]">{value}</div>
     </div>
   )
 }
@@ -240,169 +190,381 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  const featured = PROJECTS_CONTENT[0]
+  const supportingProjects = PROJECTS_CONTENT.slice(1, 3)
+
   return (
     <div className="relative">
-      <div className="fixed left-0 top-0 z-50 h-1 bg-[var(--accent)]" style={{ width: `${scrollProgress}%` }} />
+      {/* Scroll Progress Bar at top */}
+      <div
+        className="fixed left-0 top-0 z-50 h-1 bg-[var(--primary)] transition-[width] duration-150"
+        style={{ width: `${scrollProgress}%` }}
+        aria-hidden="true"
+      />
 
-      <section id="hero" className="relative overflow-hidden px-6 pb-16 pt-20 lg:px-8 lg:pt-28">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(127,119,221,0.08),transparent_28%),radial-gradient(circle_at_88%_14%,rgba(29,158,117,0.08),transparent_25%)]" />
-        <div className="absolute right-8 top-14 h-40 w-40 rounded-full bg-[var(--purple-fill)] blur-3xl" />
-        <div className="absolute right-24 top-28 h-28 w-28 rounded-full bg-[var(--teal-fill)] blur-3xl" />
-        <div className="absolute left-0 top-28 h-px w-full bg-gradient-to-r from-transparent via-[rgba(127,119,221,0.14)] to-transparent" />
-        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-end lg:gap-14">
+      {/* Hero Section */}
+      <section
+        id="hero"
+        className="relative scroll-mt-32 overflow-hidden px-6 pb-20 pt-28 sm:pt-32 lg:px-8 lg:pt-36"
+      >
+        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-14">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55 }}
-            className="space-y-8"
+            className="space-y-7"
           >
-            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-soft)] bg-white/80 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.28em] text-[#534ab7] shadow-[0_14px_30px_rgba(22,20,31,0.04)] backdrop-blur-sm">
-              <span className="h-2 w-2 rounded-full bg-[var(--accent)]" aria-hidden="true" />
-              <span>Data science portfolio</span>
+            {/* Top Row: Circular Rotating Badge + Status */}
+            <div className="flex items-center gap-4">
+              {/* Circular Rotating Sticker "Open for work" */}
+              <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0"
+                >
+                  <svg viewBox="0 0 100 100" className="h-full w-full">
+                    <path
+                      id="circlePath"
+                      d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"
+                      fill="none"
+                    />
+                    <text className="text-[9.5px] font-mono font-bold uppercase tracking-[0.18em] fill-[var(--text-muted)] dark:fill-[var(--accent-soft)]">
+                      <textPath href="#circlePath">
+                        ★ OPEN FOR WORK ★ OPEN FOR COLLAB
+                      </textPath>
+                    </text>
+                  </svg>
+                </motion.div>
+                {/* Center dot in soft lavender with gentle glow in dark mode */}
+                <span className="h-3 w-3 rounded-full bg-[var(--accent)] ring-4 ring-[var(--accent-pale)] dark:shadow-[0_0_12px_var(--accent)]" />
+              </div>
+
+              {/* Status pill */}
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg)] px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--primary)] dark:text-[var(--accent-soft)] [box-shadow:var(--glass-highlight),var(--glass-shadow)] backdrop-blur-md">
+                <span className="h-2 w-2 rounded-full bg-[var(--primary)] dark:bg-[var(--accent)]" aria-hidden="true" />
+                <span>{HERO_CONTENT.badge}</span>
+              </div>
             </div>
-            <div className="space-y-5">
-              <h1 className="max-w-4xl text-5xl font-semibold tracking-tight text-[var(--text)] text-balance sm:text-6xl lg:text-7xl">
-                <span className="block">Aulia Bilqisty</span>
-                <span className="mt-2 block text-[var(--text-muted)]">Data science, BI, and product thinking</span>
+
+            {/* Headline with Sans Bold Name + Serif Italic Keyword (Gradient in Dark Mode) */}
+            <div className="space-y-3">
+              <h1 className="max-w-4xl text-4xl font-black tracking-tight text-[var(--text)] sm:text-5xl lg:text-6xl text-balance">
+                <span className="block">{HERO_CONTENT.name}</span>
+                <span className="mt-2 block font-serif italic font-normal text-3xl sm:text-4xl lg:text-5xl text-[var(--primary)] dark:bg-gradient-to-r dark:from-[#5B8CFF] dark:to-[#C4B5FD] dark:bg-clip-text dark:text-transparent">
+                  Data Scientist &amp; UI/UX Designer
+                </span>
               </h1>
-              <p className="max-w-2xl text-lg leading-8 text-[var(--text-muted)]">
-                Mahasiswa Sistem Informasi Bisnis di Politeknik Negeri Malang yang fokus pada data, product thinking, dan visual storytelling.
+              <p className="max-w-2xl text-base leading-relaxed text-[var(--text-muted)] sm:text-lg text-balance">
+                {HERO_CONTENT.description}
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              <a href="#projects" className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,var(--accent),#5f5ad3)] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(127,119,221,0.28)] transition-transform hover:-translate-y-0.5">
-                Featured projects
-                <ArrowRight className="h-4 w-4" />
-              </a>
-              <a href="#contact" className="inline-flex items-center gap-2 rounded-full border border-[var(--border-soft)] bg-white/85 px-6 py-3.5 text-sm font-semibold text-[var(--text)] shadow-[0_14px_30px_rgba(22,20,31,0.04)] backdrop-blur-sm transition-colors hover:border-[var(--accent)]/35">
-                Contact
-              </a>
+            {/* CTAs using MagneticButton */}
+            <div className="flex flex-wrap items-center gap-4 pt-1">
+              <MagneticButton
+                href={HERO_CONTENT.ctaPrimary.href}
+                className="rounded-full bg-[var(--primary)] px-7 py-3.5 text-sm font-bold text-white shadow-[0_12px_28px_rgba(36,87,214,0.3)] dark:shadow-[0_10px_25px_rgba(91,140,255,0.35)] hover:bg-[var(--primary-hover)]"
+              >
+                <span>{HERO_CONTENT.ctaPrimary.label}</span>
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </MagneticButton>
+
+              <MagneticButton
+                href={HERO_CONTENT.ctaSecondary.href}
+                className="rounded-full border border-[var(--border)] bg-[var(--surface)] px-7 py-3.5 text-sm font-semibold text-[var(--text)] shadow-xs hover:border-[var(--primary)]/40 hover:bg-[var(--surface-2)]"
+              >
+                <span>{HERO_CONTENT.ctaSecondary.label}</span>
+              </MagneticButton>
             </div>
 
-            <div className="flex flex-wrap gap-4 text-sm text-[var(--text-muted)]">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[var(--border-soft)] bg-white/80 px-4 py-2 shadow-[0_12px_24px_rgba(22,20,31,0.03)] backdrop-blur-sm">
-                <MapPin className="h-4 w-4" /> Malang, Indonesia
+            {/* Location & Affiliation badges */}
+            <div className="flex flex-wrap gap-3 text-sm text-[var(--text-muted)]">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3.5 py-1.5 text-xs font-medium shadow-2xs">
+                <MapPin className="h-3.5 w-3.5 text-[var(--primary)] dark:text-[var(--accent-soft)]" /> {HERO_CONTENT.location}
               </span>
-              <span className="inline-flex items-center rounded-full border border-[var(--border-soft)] bg-white/80 px-4 py-2 shadow-[0_12px_24px_rgba(22,20,31,0.03)] backdrop-blur-sm">SIB · Polinema</span>
+              <span className="inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--surface)] px-3.5 py-1.5 text-xs font-medium shadow-2xs">
+                {HERO_CONTENT.affiliation}
+              </span>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3 lg:max-w-3xl">
-              {heroMetrics.map((metric) => (
+            {/* Metric counters with dominant blue numbers */}
+            <div className="grid gap-3 sm:grid-cols-3 lg:max-w-2xl">
+              {HERO_CONTENT.metrics.map((metric) => (
                 <MetricTile key={metric.label} metric={metric} />
               ))}
             </div>
           </motion.div>
 
+          {/* Hero Visual Card: Viewfinder Carousel */}
           <motion.div
             initial={{ opacity: 0, y: 18, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.05 }}
-            className="relative flex justify-center lg:justify-self-end"
+            className="relative flex w-full justify-center lg:justify-end"
           >
             <div className="relative mx-auto w-full max-w-[28rem]">
-              <div className="absolute -right-5 -top-6 h-16 w-16 rounded-full bg-[var(--purple-fill)] blur-xl" />
-              <div className="absolute -left-6 bottom-10 h-12 w-12 rounded-full bg-[var(--teal-fill)] blur-xl" />
-              <div className="overflow-hidden rounded-[2rem] border border-[var(--border-soft)] bg-white/80 p-3 shadow-[0_30px_80px_rgba(22,20,31,0.08)] backdrop-blur-xl">
-                <div className="overflow-hidden rounded-[1.6rem] bg-[linear-gradient(180deg,#16141f_0%,#1a1824_100%)]">
-                  <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 text-[11px] uppercase tracking-[0.24em] text-white/45">
-                    <span>Professional photo</span>
-                    <span>Portfolio</span>
-                  </div>
-                  <img
-                    src={screenshotSource}
-                    alt="Professional portrait of Aulia Bilqisty"
-                    className="h-[28rem] w-full object-cover object-center"
-                  />
-                </div>
+              {/* Carousel dalam frame tipis */}
+              <div className="group overflow-hidden rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-3 [box-shadow:var(--glass-highlight),var(--glass-shadow)] backdrop-blur-[var(--glass-blur-mobile)] md:backdrop-blur-[var(--glass-blur)]">
+                <ViewfinderCarousel />
               </div>
 
-              <div className="absolute -bottom-5 left-6 rounded-full border border-[var(--border-soft)] bg-white px-4 py-2 text-xs font-medium uppercase tracking-[0.24em] text-[var(--text-muted)] shadow-sm">
-                Data Scientist · BI
+              {/* Decorative Data-Viz Widget (Insight Engine) */}
+              <div className="absolute -bottom-10 -left-4 sm:-left-8 whitespace-nowrap z-30 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg-strong)] p-3.5 [box-shadow:var(--glass-highlight),var(--glass-shadow)] dark:[box-shadow:var(--glass-highlight),0_12px_28px_rgba(0,0,0,0.65),0_0_20px_rgba(167,139,250,0.15)] backdrop-blur-md">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-end gap-1 h-7">
+                    <span className="w-1.5 rounded-full bg-[var(--accent)] h-3 animate-pulse" />
+                    <span className="w-1.5 rounded-full bg-[var(--accent)] h-6 animate-pulse" style={{ animationDelay: "200ms" }} />
+                    <span className="w-1.5 rounded-full bg-[var(--accent-soft)] h-4 animate-pulse" style={{ animationDelay: "400ms" }} />
+                    <span className="w-1.5 rounded-full bg-[var(--primary)] h-7 animate-pulse" style={{ animationDelay: "150ms" }} />
+                    <span className="w-1.5 rounded-full bg-[var(--accent)] h-5 animate-pulse" style={{ animationDelay: "300ms" }} />
+                  </div>
+                  <div>
+                    <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[var(--primary)] dark:text-[var(--accent-soft)]">
+                      Insight Engine
+                    </span>
+                    <span className="block text-[11px] font-semibold text-[var(--text)]">
+                      Data &amp; User Behavior
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      <section id="projects" className="px-6 py-20 lg:px-8">
-        <div className="mx-auto max-w-7xl space-y-10">
+      {/* Section 01: About Me (3-Kolom Editorial + Statistik) */}
+      <section id="about" className="scroll-mt-28 sm:scroll-mt-32 px-6 py-20 mt-6 lg:px-8">
+        <div className="mx-auto max-w-7xl space-y-12">
           <SectionHeading
-            eyebrow="Selected Projects"
-            title="Projects are the main focus"
-            description="One large featured case study, followed by two smaller supporting projects."
+            number="01"
+            eyebrow={ABOUT_CONTENT.label}
+            title={ABOUT_CONTENT.heading}
+            description={ABOUT_CONTENT.journey}
           />
-          <div className="grid gap-5">
-            <ProjectCardBlock project={featuredProjects[0]} />
-            <div className="grid gap-5 lg:grid-cols-2">
-              {featuredProjects.slice(1).map((project) => (
-                <ProjectMiniCard key={project.title} project={project} />
+
+          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            {/* 2 Kolom Bio Card */}
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="rounded-2xl md:rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-6 [box-shadow:var(--glass-highlight),var(--glass-shadow)] backdrop-blur-md">
+                <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[var(--primary)] dark:text-[var(--accent-soft)]">
+                  Fondasi &amp; Analitik
+                </span>
+                <p className="mt-3 text-sm leading-relaxed text-[var(--text-muted)]">
+                  {ABOUT_CONTENT.bioLeft}
+                </p>
+              </div>
+
+              <div className="rounded-2xl md:rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-6 [box-shadow:var(--glass-highlight),var(--glass-shadow)] backdrop-blur-md">
+                <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[var(--primary)] dark:text-[var(--accent-soft)]">
+                  Desain &amp; Nilai Produk
+                </span>
+                <p className="mt-3 text-sm leading-relaxed text-[var(--text-muted)]">
+                  {ABOUT_CONTENT.bioRight}
+                </p>
+              </div>
+            </div>
+
+            {/* Statistik Ringkas */}
+            <div className="grid grid-cols-3 gap-3">
+              {ABOUT_CONTENT.stats.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-4 text-center [box-shadow:var(--glass-highlight),var(--glass-shadow)] backdrop-blur-md"
+                >
+                  <div className="text-2xl font-extrabold text-[var(--primary)] dark:text-[#7FA3FF] sm:text-3xl">
+                    {stat.value}
+                  </div>
+                  <div className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                    {stat.label}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
         </div>
       </section>
 
-      <section id="experience" className="px-6 py-16 lg:px-8">
+      {/* Section 02: Projects */}
+      <section id="projects" className="scroll-mt-28 sm:scroll-mt-32 px-6 py-20 lg:px-8">
         <div className="mx-auto max-w-7xl space-y-10">
           <SectionHeading
-            eyebrow="Experience"
-            title="A compact timeline"
-            description="Kept vertical and minimal, with purple dots to keep attention on the content."
+            number="02"
+            eyebrow={SECTION_HEADINGS.projects.eyebrow}
+            title={SECTION_HEADINGS.projects.title}
+            description={SECTION_HEADINGS.projects.description}
           />
-          <ExperienceTimeline items={experienceItems} />
+          <div className="grid gap-6">
+            {featured && <TiltProjectCard project={featured} />}
+            <div className="grid gap-6 lg:grid-cols-2">
+              {supportingProjects.map((project) => (
+                <MiniTiltProjectCard key={project.title} project={project} />
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      <section id="skills" className="px-6 py-16 lg:px-8">
+      {/* Section 03: Experience */}
+      <section id="experience" className="scroll-mt-28 sm:scroll-mt-32 px-6 py-16 lg:px-8">
         <div className="mx-auto max-w-7xl space-y-10">
           <SectionHeading
-            eyebrow="Skills"
-            title="Core capabilities as color groups"
-            description="Four compact cards, each with its own calm color family."
+            number="03"
+            eyebrow={SECTION_HEADINGS.experience.eyebrow}
+            title={SECTION_HEADINGS.experience.title}
+            description={SECTION_HEADINGS.experience.description}
           />
-          <SkillBadgeGrid groups={skillGroups} />
+          <ExperienceTimeline
+            items={EXPERIENCE_CONTENT.map((item) => ({
+              ...item,
+              summary: item.summary ?? "",
+              tone: item.tone ?? "indigo",
+            }))}
+          />
         </div>
       </section>
 
-      <section id="contact" className="px-6 py-16 lg:px-8 lg:pb-24">
-        <div className="mx-auto max-w-7xl rounded-[2rem] border border-[var(--border-soft)] bg-[linear-gradient(180deg,rgba(255,255,255,0.92)_0%,rgba(246,244,251,0.9)_100%)] p-8 shadow-[0_30px_80px_rgba(22,20,31,0.06)] lg:p-10">
-          <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+      {/* Section 04: Skills (4 Groups: Data Science, UI/UX & Design, Fotografi, Videografi) */}
+      <section id="skills" className="scroll-mt-28 sm:scroll-mt-32 px-6 py-16 lg:px-8">
+        <div className="mx-auto max-w-7xl space-y-10">
+          <SectionHeading
+            number="04"
+            eyebrow={SECTION_HEADINGS.skills.eyebrow}
+            title={SECTION_HEADINGS.skills.title}
+            description={SECTION_HEADINGS.skills.description}
+          />
+          <SkillBadgeGrid groups={SKILLS_CONTENT} />
+        </div>
+      </section>
+
+      {/* Section 05: Creative Works (Polaroid Photo Gallery + Film Strip Video Cards) */}
+      <section id="creative" className="scroll-mt-28 sm:scroll-mt-32 px-6 py-16 lg:px-8">
+        <div className="mx-auto max-w-7xl space-y-10">
+          <SectionHeading
+            number="05"
+            eyebrow={CREATIVE_CONTENT.eyebrow}
+            title={CREATIVE_CONTENT.title}
+            description={CREATIVE_CONTENT.description}
+          />
+
+          {/* Polaroid Photo Gallery */}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 pt-2">
+            {CREATIVE_CONTENT.photos.map((photo, i) => (
+              <motion.div
+                key={photo.id}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+                whileHover={{ y: -6, rotate: i % 2 === 0 ? -1.5 : 1.5 }}
+                className="group rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 pb-6 shadow-md transition-all duration-300"
+              >
+                <div className="overflow-hidden rounded-xl bg-[var(--surface-2)] aspect-[4/3] flex flex-col items-center justify-center p-4 text-center">
+                  <span className="text-3xl">📸</span>
+                  <span className="mt-2 text-xs font-semibold text-[var(--primary)] dark:text-[#7FA3FF]">{photo.category}</span>
+                </div>
+                <div className="mt-4 px-1">
+                  <h4 className="text-sm font-bold text-[var(--text)]">{photo.title}</h4>
+                  <p className="mt-1 text-xs text-[var(--text-muted)] line-clamp-2">{photo.caption}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Film Strip Video Cards */}
+          <div className="grid gap-6 md:grid-cols-2 pt-4">
+            {CREATIVE_CONTENT.videos.map((video) => (
+              <div
+                key={video.id}
+                className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] [box-shadow:var(--glass-highlight),var(--glass-shadow)]"
+              >
+                {/* Film Perforations (Sprocket Holes) Top */}
+                <div className="flex justify-between border-b border-[var(--border)] bg-[var(--surface-2)] px-4 py-1.5 opacity-60">
+                  {Array.from({ length: 8 }).map((_, idx) => (
+                    <span key={idx} className="h-2 w-3 rounded-xs border border-[var(--border)] bg-[var(--bg)]" />
+                  ))}
+                </div>
+
+                <div className="p-6">
+                  <div className="flex items-center justify-between text-xs font-mono font-semibold text-[var(--primary)] dark:text-[#7FA3FF]">
+                    <span className="flex items-center gap-1.5">
+                      <Play className="h-3.5 w-3.5 fill-current" /> {video.role}
+                    </span>
+                    <span>{video.duration}</span>
+                  </div>
+                  <h4 className="mt-3 text-lg font-bold text-[var(--text)]">{video.title}</h4>
+                  <p className="mt-2 text-sm text-[var(--text-muted)] leading-relaxed">{video.description}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {video.tools.map((t) => (
+                      <span key={t} className="rounded-full border border-[var(--border)] bg-[var(--surface-2)] px-2.5 py-0.5 text-[11px] font-medium text-[var(--text)]">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Film Perforations (Sprocket Holes) Bottom */}
+                <div className="flex justify-between border-t border-[var(--border)] bg-[var(--surface-2)] px-4 py-1.5 opacity-60">
+                  {Array.from({ length: 8 }).map((_, idx) => (
+                    <span key={idx} className="h-2 w-3 rounded-xs border border-[var(--border)] bg-[var(--bg)]" />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Section 06: Contact */}
+      <section id="contact" className="scroll-mt-28 sm:scroll-mt-32 px-6 py-16 lg:px-8 lg:pb-24">
+        <div className="mx-auto max-w-7xl rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-8 [box-shadow:var(--glass-highlight),var(--glass-shadow)] backdrop-blur-[var(--glass-blur-mobile)] md:backdrop-blur-[var(--glass-blur)] backdrop-saturate-[180%] lg:p-12">
+          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div className="space-y-4">
-              <p className="text-xs font-medium uppercase tracking-[0.3em] text-[var(--text-muted)]">Contact</p>
-              <h2 className="text-3xl font-semibold tracking-tight text-[var(--text)] md:text-4xl">
-                Open to thoughtful projects and collaborations.
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs font-bold text-[var(--primary)] bg-[var(--primary-soft)] border border-[var(--primary)]/20 px-2 py-0.5 rounded-md">
+                  06
+                </span>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--primary)] dark:text-[var(--accent-soft)]">
+                  {SECTION_HEADINGS.contact.eyebrow}
+                </p>
+              </div>
+
+              <h2 className="text-3xl font-extrabold tracking-tight text-[var(--text)] md:text-4xl text-balance">
+                {SECTION_HEADINGS.contact.title}
               </h2>
-              <p className="max-w-2xl text-base leading-7 text-[var(--text-muted)]">
-                If you want a portfolio that feels cleaner, more premium, and recruiter-friendly, this layout now puts the right emphasis on your name, profession, and work.
+
+              <p className="max-w-2xl text-base leading-relaxed text-[var(--text-muted)]">
+                {SECTION_HEADINGS.contact.description}
               </p>
-              <div className="flex flex-wrap gap-3 pt-2">
-                <button
-                  type="button"
+
+              <div className="flex flex-wrap gap-3 pt-3">
+                <MagneticButton
                   onClick={() => {
-                    navigator.clipboard.writeText(SITE_CONFIG.social.email)
-                    showToast("Email copied", "success")
+                    navigator.clipboard.writeText(CONTACT_CONTENT.email)
+                    showToast("Email berhasil disalin!", "success")
                   }}
-                  className="inline-flex items-center gap-2 rounded-full bg-[var(--accent)] px-6 py-3.5 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5"
+                  className="rounded-full bg-[var(--primary)] px-6 py-3.5 text-sm font-bold text-white shadow-[0_10px_25px_rgba(36,87,214,0.3)] dark:shadow-[0_10px_25px_rgba(91,140,255,0.35)] hover:bg-[var(--primary-hover)]"
                 >
-                  <Mail className="h-4 w-4" /> Copy email
-                </button>
-                <a
-                  href="https://linkedin.com"
+                  <Mail className="mr-2 h-4 w-4" /> Salin Email
+                </MagneticButton>
+
+                <MagneticButton
+                  href={CONTACT_CONTENT.linkedin}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="inline-flex items-center gap-2 rounded-full border border-[var(--border-soft)] px-6 py-3.5 text-sm font-semibold text-[var(--text)] transition-colors hover:border-[var(--accent)]/40"
+                  className="rounded-full border border-[var(--border)] bg-[var(--surface)] px-6 py-3.5 text-sm font-semibold text-[var(--text)] shadow-xs hover:border-[var(--primary)]/40 hover:bg-[var(--surface-2)]"
                 >
                   LinkedIn
-                </a>
+                </MagneticButton>
               </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <ContactDetailCard label="Email" value={SITE_CONFIG.social.email} />
-              <ContactDetailCard label="Institution" value={SITE_CONFIG.institution} />
-              <ContactDetailCard label="Major" value={SITE_CONFIG.major} />
-              <ContactDetailCard label="Focus" value={SITE_CONFIG.focus.join(" · ")} />
+              <ContactDetailCard label="Email" value={CONTACT_CONTENT.email} />
+              <ContactDetailCard label="Institusi" value={CONTACT_CONTENT.institution} />
+              <ContactDetailCard label="Program Studi" value={CONTACT_CONTENT.major} />
+              <ContactDetailCard label="Fokus Utama" value={CONTACT_CONTENT.focus.join(" · ")} />
             </div>
           </div>
         </div>

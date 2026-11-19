@@ -1,26 +1,80 @@
-@import "tailwindcss";
+@reference "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --font-jakarta: 'Plus Jakarta Sans', sans-serif;
+    --bg: #ffffff;
+    --bg2: #f6f5fb;
+    --bg-dark: #16141f;
+    --text: #16141f;
+    --text-muted: #6d6a7c;
+    --accent: #7f77dd;
+    --accent-2: #1d9e75;
+    --purple-fill: #eeedfe;
+    --teal-fill: #e1f5ee;
+    --amber-fill: #faeeda;
+    --coral-fill: #faece7;
+    --card-bg: rgba(255, 255, 255, 0.96);
+    --surface: #f6f5fa;
+    --surface-2: #ededf3;
+    --card-dark: #16141f;
+    --card-dark-2: #1a1824;
+    --border-soft: rgba(22, 20, 31, 0.08);
+  }
+
+  html.dark {
+    --bg: #111017;
+    --bg2: #16141f;
+    --bg-dark: #16141f;
+    --text: #f5f4fb;
+    --text-muted: #b5b1c4;
+    --accent: #7f77dd;
+    --accent-2: #1d9e75;
+    --purple-fill: rgba(127, 119, 221, 0.18);
+    --teal-fill: rgba(29, 158, 117, 0.18);
+    --amber-fill: rgba(250, 238, 218, 0.12);
+    --coral-fill: rgba(250, 236, 231, 0.12);
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --surface: #15131d;
+    --surface-2: #1a1824;
+    --card-dark: #16141f;
+    --card-dark-2: #1a1824;
+    --border-soft: rgba(255, 255, 255, 0.08);
+  }
+
+  * {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  body {
+    font-family: var(--font-jakarta), sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(127, 119, 221, 0.12), transparent 26%),
+      radial-gradient(circle at 85% 15%, rgba(29, 158, 117, 0.1), transparent 24%),
+      radial-gradient(circle at 18% 78%, rgba(250, 238, 218, 0.55), transparent 24%),
+      linear-gradient(180deg, #ffffff 0%, #fbfbfe 56%, #f6f4fb 100%);
+    color: var(--text);
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .font-jakarta {
+    font-family: var(--font-jakarta);
+  }
+
+  .surface {
+    @apply border border-[var(--border-soft)] bg-[var(--card-bg)] backdrop-blur-xl;
+  }
 }

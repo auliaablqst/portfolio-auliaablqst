@@ -100,6 +100,8 @@ export interface SkillGroup {
 
 export interface CreativePhoto {
   id: string
+  src: string
+  alt: string
   title: string
   caption: string
   category: string
@@ -571,6 +573,8 @@ export const CREATIVE_CONTENT: CreativeContent = {
   photos: [
     {
       id: "photo-1",
+      src: "",
+      alt: "Fotografi arsitektur kota dengan garis dan bayangan modern.",
       title: "Geometri Perkotaan",
       caption: "Studi garis dan bayangan arsitektur modern perkotaan.",
       category: "Arsitektur",
@@ -579,6 +583,8 @@ export const CREATIVE_CONTENT: CreativeContent = {
     },
     {
       id: "photo-2",
+      src: "",
+      alt: "Potret dengan pencahayaan alami saat golden hour.",
       title: "Potret Cahaya Alami",
       caption: "Eksplorasi pencahayaan natural di golden hour.",
       category: "Potret",
@@ -587,6 +593,8 @@ export const CREATIVE_CONTENT: CreativeContent = {
     },
     {
       id: "photo-3",
+      src: "",
+      alt: "Detail tekstur dan material kerajinan lokal.",
       title: "Detail & Tekstur Kerajinan",
       caption: "Studio macro capture untuk detail material kerajinan lokal.",
       category: "Produk",
@@ -595,6 +603,8 @@ export const CREATIVE_CONTENT: CreativeContent = {
     },
     {
       id: "photo-4",
+      src: "",
+      alt: "Suasana dan aktivitas pejalan kaki di pusat kota.",
       title: "Dinamika Jalanan",
       caption: "Merekam ritme dan aktivitas pejalan kaki di pusat kota.",
       category: "Street Photography",

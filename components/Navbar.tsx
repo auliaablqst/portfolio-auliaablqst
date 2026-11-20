@@ -109,7 +109,7 @@ export function Navbar() {
           {/* Logo / Initials (Left) */}
           <Link
             href="#hero"
-            className="group flex min-h-[38px] items-center gap-2.5 rounded-full pr-1 text-[var(--text)] no-underline transition-transform hover:scale-[1.02] focus-visible:outline-none"
+            className="group flex min-h-[38px] items-center rounded-full pr-1 text-[var(--text)] no-underline transition-transform hover:scale-[1.02] focus-visible:outline-none"
             onClick={() => setMobileMenuOpen(false)}
           >
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--primary)] text-[11px] font-bold text-white shadow-sm">
@@ -119,9 +119,18 @@ export function Navbar() {
                 .slice(0, 2)
                 .join("") || "AB"}
             </span>
-            <span className="hidden text-xs font-bold tracking-tight text-[var(--text)] sm:inline no-underline">
+            <motion.span
+              initial={false}
+              animate={{
+                width: isScrolled ? 0 : "auto",
+                marginLeft: isScrolled ? 0 : 10,
+                opacity: isScrolled ? 0 : 1,
+              }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="inline-block overflow-hidden whitespace-nowrap text-xs font-bold tracking-tight text-[var(--text)] no-underline"
+            >
               {SITE_CONFIG.name}
-            </span>
+            </motion.span>
           </Link>
 
           {/* Desktop Nav Items (Center, Spacing adapts to scroll) */}

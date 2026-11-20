@@ -95,7 +95,7 @@ export interface ExperienceItem {
 export interface SkillGroup {
   category: string
   tone: "indigo" | "amber" | "emerald"
-  items: string[]
+  items: { name: string; icon: string }[]
 }
 
 export interface CreativePhoto {
@@ -511,13 +511,15 @@ export const SKILLS_CONTENT: SkillGroup[] = [
     tone: "indigo",
     // TODO: ganti daftar tools/skills Data Science
     items: [
-      "Python",
-      "Pandas & NumPy",
-      "Scikit-Learn",
-      "SQL (PostgreSQL / MySQL)",
-      "Power BI",
-      "Tableau",
-      "Data Cleaning & EDA",
+      { name: "Python", icon: "python" },
+      { name: "Pandas", icon: "pandas" },
+      { name: "NumPy", icon: "numpy" },
+      { name: "Scikit-Learn", icon: "scikit-learn" },
+      { name: "PostgreSQL", icon: "postgresql" },
+      { name: "MySQL", icon: "mysql" },
+      { name: "Power BI", icon: "power-bi" },
+      { name: "Tableau", icon: "tableau" },
+      { name: "Data Cleaning & EDA", icon: "data-cleaning" },
     ],
   },
   {
@@ -525,12 +527,12 @@ export const SKILLS_CONTENT: SkillGroup[] = [
     tone: "amber",
     // TODO: ganti daftar tools/skills UI/UX
     items: [
-      "Figma",
-      "Design Systems",
-      "Wireframing & Prototyping",
-      "User Research & Journey",
-      "Information Architecture",
-      "Responsive Layouts",
+      { name: "Figma", icon: "figma" },
+      { name: "Design Systems", icon: "design-systems" },
+      { name: "Wireframing & Prototyping", icon: "wireframing" },
+      { name: "User Research & Journey", icon: "user-research" },
+      { name: "Information Architecture", icon: "information-architecture" },
+      { name: "Responsive Layouts", icon: "responsive-layouts" },
     ],
   },
   {
@@ -538,12 +540,12 @@ export const SKILLS_CONTENT: SkillGroup[] = [
     tone: "emerald",
     // TODO: ganti daftar tools/skills Fotografi
     items: [
-      "Komposisi & Framing",
-      "Pencahayaan Studio",
-      "Foto Editorial & Potret",
-      "Adobe Lightroom",
-      "Koreksi Warna & Retouching",
-      "Fotografi Produk",
+      { name: "Komposisi & Framing", icon: "composition" },
+      { name: "Pencahayaan Studio", icon: "lighting" },
+      { name: "Foto Editorial & Potret", icon: "editorial-photography" },
+      { name: "Adobe Lightroom", icon: "lightroom" },
+      { name: "Koreksi Warna & Retouching", icon: "color-correction" },
+      { name: "Fotografi Produk", icon: "product-photography" },
     ],
   },
   {
@@ -551,12 +553,12 @@ export const SKILLS_CONTENT: SkillGroup[] = [
     tone: "indigo",
     // TODO: ganti daftar tools/skills Videografi
     items: [
-      "Storyboarding & Scripting",
-      "Sinematografi Dasar",
-      "Adobe Premiere Pro",
-      "DaVinci Resolve",
-      "Color Grading (Rec.709)",
-      "Audio Mixing Dasar",
+      { name: "Storyboarding & Scripting", icon: "storyboarding" },
+      { name: "Sinematografi Dasar", icon: "cinematography" },
+      { name: "Adobe Premiere Pro", icon: "premiere-pro" },
+      { name: "DaVinci Resolve", icon: "davinci-resolve" },
+      { name: "Color Grading (Rec.709)", icon: "color-grading" },
+      { name: "Audio Mixing Dasar", icon: "audio-mixing" },
     ],
   },
 ]

@@ -637,3 +637,41 @@ export const CONTACT_CONTENT: ContactContent = {
   major: "Sistem Informasi Bisnis",
   focus: ["Data Science", "UI/UX Design", "Creative Media"],
 }
+
+export const SOCIAL_LINKS = {
+  // TODO: ganti URL dan handle WhatsApp
+  whatsapp: {
+    url: "https://wa.me/62XXXXXXXXXX",
+    handle: "+62 XXXXXXXX",
+  },
+  // TODO: ganti URL dan handle Instagram
+  instagram: {
+    url: "https://instagram.com/username",
+    handle: "@username",
+  },
+  // TODO: ganti URL dan handle LinkedIn
+  linkedin: {
+    url: "https://linkedin.com/in/username",
+    handle: "/in/username",
+  },
+  // TODO: ganti URL dan handle Email
+  email: {
+    url: "mailto:aulia@example.com",
+    handle: "aulia@example.com",
+  },
+  // TODO: ganti URL dan handle GitHub
+  github: {
+    url: "https://github.com/username",
+    handle: "@username",
+  },
+  // TODO: ganti URL dan handle YouTube
+  youtube: {
+    url: "https://youtube.com/@username",
+    handle: "@username",
+  },
+  // TODO: ganti URL dan handle Behance
+  behance: {
+    url: "https://behance.net/username",
+    handle: "/username",
+  },
+} as const

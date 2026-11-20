@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useRef } from "react"
 import { motion, useMotionValue, useSpring } from "framer-motion"
 import { ArrowRight, Mail, MapPin, Play, ExternalLink } from "lucide-react"
 import {
@@ -15,11 +15,12 @@ import {
   ProjectItem,
 } from "@/constants"
 import {
-  ExperienceTimeline,
+  ExperienceList,
   MetricTile,
   SectionHeading,
   SkillBadgeGrid,
 } from "@/components/PortfolioShowcase"
+import { SectionLabel } from "@/components/SectionLabel"
 import { useToast } from "@/components/ToastProvider"
 import { MagneticButton } from "@/components/MagneticButton"
 import { PlaceholderImage } from "@/components/PlaceholderImage"
@@ -177,31 +178,12 @@ function ContactDetailCard({ label, value }: Readonly<{ label: string; value: st
 
 export default function Home() {
   const { showToast } = useToast()
-  const [scrollProgress, setScrollProgress] = useState(0)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight
-      setScrollProgress(totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0)
-    }
-
-    handleScroll()
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
 
   const featured = PROJECTS_CONTENT[0]
   const supportingProjects = PROJECTS_CONTENT.slice(1, 3)
 
   return (
     <div className="relative">
-      {/* Scroll Progress Bar at top */}
-      <div
-        className="fixed left-0 top-0 z-50 h-1 bg-[var(--primary)] transition-[width] duration-150"
-        style={{ width: `${scrollProgress}%` }}
-        aria-hidden="true"
-      />
-
       {/* Hero Section */}
       <section
         id="hero"
@@ -334,63 +316,28 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section 01: About Me (3-Kolom Editorial + Statistik) */}
-      <section id="about" className="scroll-mt-28 sm:scroll-mt-32 px-6 py-20 mt-6 lg:px-8">
-        <div className="mx-auto max-w-7xl space-y-12">
-          <SectionHeading
-            number="01"
-            eyebrow={ABOUT_CONTENT.label}
-            title={ABOUT_CONTENT.heading}
-            description={ABOUT_CONTENT.journey}
-          />
-
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-            {/* 2 Kolom Bio Card */}
-            <div className="grid gap-6 sm:grid-cols-2">
-              <div className="rounded-2xl md:rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-6 [box-shadow:var(--glass-highlight),var(--glass-shadow)] backdrop-blur-md">
-                <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[var(--primary)] dark:text-[var(--accent-soft)]">
-                  Fondasi &amp; Analitik
-                </span>
-                <p className="mt-3 text-sm leading-relaxed text-[var(--text-muted)]">
-                  {ABOUT_CONTENT.bioLeft}
-                </p>
-              </div>
-
-              <div className="rounded-2xl md:rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-6 [box-shadow:var(--glass-highlight),var(--glass-shadow)] backdrop-blur-md">
-                <span className="block text-xs font-mono font-bold uppercase tracking-wider text-[var(--primary)] dark:text-[var(--accent-soft)]">
-                  Desain &amp; Nilai Produk
-                </span>
-                <p className="mt-3 text-sm leading-relaxed text-[var(--text-muted)]">
-                  {ABOUT_CONTENT.bioRight}
-                </p>
-              </div>
+      <section id="about" className="scroll-mt-36 sm:scroll-mt-40 px-6 py-20 mt-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="max-w-[65ch]">
+            <SectionLabel label={ABOUT_CONTENT.label} />
+            <h2 className="text-3xl font-extrabold tracking-tight text-[var(--text)] text-balance sm:text-4xl md:text-5xl">
+              {ABOUT_CONTENT.heading}
+            </h2>
+            <div className="mt-8 space-y-5 text-base leading-8 text-[var(--text-muted)] sm:text-lg">
+              <p>{ABOUT_CONTENT.bioLeft}</p>
+              <p>{ABOUT_CONTENT.bioRight}</p>
             </div>
-
-            {/* Statistik Ringkas */}
-            <div className="grid grid-cols-3 gap-3">
-              {ABOUT_CONTENT.stats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-4 text-center [box-shadow:var(--glass-highlight),var(--glass-shadow)] backdrop-blur-md"
-                >
-                  <div className="text-2xl font-extrabold text-[var(--primary)] dark:text-[#7FA3FF] sm:text-3xl">
-                    {stat.value}
-                  </div>
-                  <div className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <p className="mt-8 text-sm font-medium tracking-wide text-[var(--text-muted)]">
+              {ABOUT_CONTENT.focusAreas.join(" · ")}
+            </p>
           </div>
         </div>
       </section>
 
       {/* Section 02: Projects */}
-      <section id="projects" className="scroll-mt-28 sm:scroll-mt-32 px-6 py-20 lg:px-8">
+      <section id="projects" className="scroll-mt-36 sm:scroll-mt-40 px-6 py-20 lg:px-8">
         <div className="mx-auto max-w-7xl space-y-10">
           <SectionHeading
-            number="02"
             eyebrow={SECTION_HEADINGS.projects.eyebrow}
             title={SECTION_HEADINGS.projects.title}
             description={SECTION_HEADINGS.projects.description}
@@ -407,29 +354,30 @@ export default function Home() {
       </section>
 
       {/* Section 03: Experience */}
-      <section id="experience" className="scroll-mt-28 sm:scroll-mt-32 px-6 py-16 lg:px-8">
+      <section id="experience" className="scroll-mt-36 sm:scroll-mt-40 px-6 py-16 lg:px-8">
         <div className="mx-auto max-w-7xl space-y-10">
           <SectionHeading
-            number="03"
             eyebrow={SECTION_HEADINGS.experience.eyebrow}
             title={SECTION_HEADINGS.experience.title}
             description={SECTION_HEADINGS.experience.description}
           />
-          <ExperienceTimeline
+          <ExperienceList
             items={EXPERIENCE_CONTENT.map((item) => ({
-              ...item,
+              period: item.period,
+              role: item.role,
+              organization: item.organization,
               summary: item.summary ?? "",
-              tone: item.tone ?? "indigo",
+              highlights: item.highlights,
+              tools: item.tools,
             }))}
           />
         </div>
       </section>
 
       {/* Section 04: Skills (4 Groups: Data Science, UI/UX & Design, Fotografi, Videografi) */}
-      <section id="skills" className="scroll-mt-28 sm:scroll-mt-32 px-6 py-16 lg:px-8">
+      <section id="skills" className="scroll-mt-36 sm:scroll-mt-40 px-6 py-16 lg:px-8">
         <div className="mx-auto max-w-7xl space-y-10">
           <SectionHeading
-            number="04"
             eyebrow={SECTION_HEADINGS.skills.eyebrow}
             title={SECTION_HEADINGS.skills.title}
             description={SECTION_HEADINGS.skills.description}
@@ -439,10 +387,9 @@ export default function Home() {
       </section>
 
       {/* Section 05: Creative Works (Polaroid Photo Gallery + Film Strip Video Cards) */}
-      <section id="creative" className="scroll-mt-28 sm:scroll-mt-32 px-6 py-16 lg:px-8">
+      <section id="creative" className="scroll-mt-36 sm:scroll-mt-40 px-6 py-16 lg:px-8">
         <div className="mx-auto max-w-7xl space-y-10">
           <SectionHeading
-            number="05"
             eyebrow={CREATIVE_CONTENT.eyebrow}
             title={CREATIVE_CONTENT.title}
             description={CREATIVE_CONTENT.description}
@@ -517,18 +464,11 @@ export default function Home() {
       </section>
 
       {/* Section 06: Contact */}
-      <section id="contact" className="scroll-mt-28 sm:scroll-mt-32 px-6 py-16 lg:px-8 lg:pb-24">
+      <section id="contact" className="scroll-mt-36 sm:scroll-mt-40 px-6 py-16 lg:px-8 lg:pb-24">
         <div className="mx-auto max-w-7xl rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-8 [box-shadow:var(--glass-highlight),var(--glass-shadow)] backdrop-blur-[var(--glass-blur-mobile)] md:backdrop-blur-[var(--glass-blur)] backdrop-saturate-[180%] lg:p-12">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-xs font-bold text-[var(--primary)] bg-[var(--primary-soft)] border border-[var(--primary)]/20 px-2 py-0.5 rounded-md">
-                  06
-                </span>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--primary)] dark:text-[var(--accent-soft)]">
-                  {SECTION_HEADINGS.contact.eyebrow}
-                </p>
-              </div>
+              <SectionLabel label={SECTION_HEADINGS.contact.eyebrow} />
 
               <h2 className="text-3xl font-extrabold tracking-tight text-[var(--text)] md:text-4xl text-balance">
                 {SECTION_HEADINGS.contact.title}

@@ -14,12 +14,10 @@ export function SectionLabel({ label, className }: Readonly<SectionLabelProps>) 
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={cn("mb-8 flex items-center gap-4", className)}
+      viewport={{ once: true, amount: 0.5 }}
+      className={cn("mb-4 text-xs font-medium tracking-[0.12em] text-[var(--text-muted)]", className)}
     >
-      <div className="h-px w-10 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-2)]" />
-      <span className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--text-muted)]">
-        {label}
-      </span>
+      {label}
     </motion.div>
   )
 }

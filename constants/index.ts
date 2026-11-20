@@ -41,11 +41,6 @@ export interface HeroContent {
   metrics: HeroMetric[]
 }
 
-export interface AboutStat {
-  value: string
-  label: string
-}
-
 export interface AboutContent {
   label: string
   heading: string
@@ -55,7 +50,7 @@ export interface AboutContent {
   bioRight: string
   avatarBadge: string
   skills: string[]
-  stats: AboutStat[]
+  focusAreas: string[]
 }
 
 export type ProjectCategory = "data" | "design" | "creative"
@@ -227,7 +222,7 @@ export const HERO_CONTENT: HeroContent = {
 // Copywriting profesional untuk tiap section (bebas dari teks catatan desain)
 export const SECTION_HEADINGS: SectionHeadings = {
   projects: {
-    eyebrow: "Selected Projects",
+    eyebrow: "Projects",
     title: "Karya Pilihan & Studi Kasus",
     description:
       "Eksplorasi proyek data science, perancangan antarmuka pengguna, dan integrasi analitik dengan fokus pada dampak nyata.",
@@ -239,19 +234,19 @@ export const SECTION_HEADINGS: SectionHeadings = {
       "Perjalanan kontribusi aktif dalam kepemimpinan teknologi, tata kelola sistem informasi, dan manajemen operasional media digital.",
   },
   skills: {
-    eyebrow: "Skills & Expertise",
+    eyebrow: "Skills",
     title: "Keahlian & Kemampuan Teknis",
     description:
       "Kombinasi kompetensi inti di bidang pengolahan data analitik dan perancangan UI/UX, diperkaya kemampuan multimedia visual.",
   },
   creative: {
-    eyebrow: "Creative Works",
+    eyebrow: "Creative",
     title: "Eksplorasi Fotografi & Videografi",
     description:
       "Karya visual kreatif yang memperkuat storytelling digital melalui komposisi cahaya, warna, dan narasi video yang dinamis.",
   },
   contact: {
-    eyebrow: "Get In Touch",
+    eyebrow: "Contact",
     title: "Terbuka untuk Diskusi & Kolaborasi",
     description:
       "Mari terhubung untuk peluang kerja profesional, riset analitik, desain produk digital, atau proyek kreatif.",
@@ -259,15 +254,15 @@ export const SECTION_HEADINGS: SectionHeadings = {
 }
 
 export const ABOUT_CONTENT: AboutContent = {
-  label: "About Me",
+  label: "About",
   heading: "Menjembatani Data, Desain, dan Cerita Visual",
   title: "About Me",
   journey:
     "Sebagai mahasiswa Sistem Informasi Bisnis di Politeknik Negeri Malang, saya meyakini bahwa data terbaik adalah data yang dapat dipahami dan diwujudkan ke dalam antarmuka yang ramah pengguna.",
   bioLeft:
-    "Berakar di Malang, minat saya berfokus pada machine learning terapan, visualisasi business intelligence, dan pengambilan keputusan berbasis fakta.",
+    "Berakar di Malang, saya tertarik pada machine learning, visualisasi business intelligence, dan keputusan berbasis data.",
   bioRight:
-    "Di ranah desain dan kreatif, saya mengeksplorasi prinsip human-centered design, fotografi studio, dan sinematografi untuk mengomunikasikan nilai produk secara persuasif.",
+    "Di ranah kreatif, saya mengeksplorasi human-centered design, fotografi, dan sinematografi untuk menyampaikan nilai produk.",
   avatarBadge: "Polinema · SIB",
   skills: [
     "Data Science & Analytics",
@@ -275,23 +270,7 @@ export const ABOUT_CONTENT: AboutContent = {
     "Business Intelligence",
     "Photography & Videography",
   ],
-  stats: [
-    {
-      // TODO: ganti dengan data asli
-      value: "3+",
-      label: "Tahun Eksplorasi",
-    },
-    {
-      // TODO: ganti dengan data asli
-      value: "10+",
-      label: "Proyek & Riset",
-    },
-    {
-      // TODO: ganti dengan data asli
-      value: "100%",
-      label: "Komitmen & Kualitas",
-    },
-  ],
+  focusAreas: ["Data Science", "UI/UX & Design", "Foto & Video"],
 }
 
 export const PROJECTS_CONTENT: ProjectItem[] = [
@@ -583,7 +562,7 @@ export const SKILLS_CONTENT: SkillGroup[] = [
 ]
 
 export const CREATIVE_CONTENT: CreativeContent = {
-  eyebrow: "Creative Work",
+  eyebrow: "Creative",
   title: "Visual Storytelling: Foto & Video",
   description:
     "Eksplorasi visual kreatif yang mengabadikan momen berharga melalui komposisi framing, pencahayaan alami, dan ritme video yang dinamis.",

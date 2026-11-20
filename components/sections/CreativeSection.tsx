@@ -1,8 +1,8 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { Play } from "lucide-react"
 import { CREATIVE_CONTENT } from "@/constants"
+import { PhotoMarquee } from "@/components/PhotoMarquee"
 import { SectionHeading } from "@/components/PortfolioShowcase"
 import { cn } from "@/lib/utils"
 
@@ -19,39 +19,8 @@ export function CreativeSection() {
           description={CREATIVE_CONTENT.description}
         />
 
-        <div className="grid gap-6 pt-2 sm:grid-cols-2 lg:grid-cols-4">
-          {CREATIVE_CONTENT.photos.map((photo, index) => (
-            <motion.div
-              key={photo.id}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: index * 0.08 }}
-              whileHover={{ y: -6, rotate: index % 2 === 0 ? -1.5 : 1.5 }}
-              className={cn(
-                "group rounded-2xl border border-[var(--border)] bg-[var(--surface)]",
-                "p-3 pb-6 shadow-md transition-all duration-300"
-              )}
-            >
-              <div
-                className={cn(
-                  "flex aspect-[4/3] flex-col items-center justify-center",
-                  "overflow-hidden rounded-xl bg-[var(--surface-2)] p-4 text-center"
-                )}
-              >
-                <span className="text-3xl">📸</span>
-                <span className="mt-2 text-xs font-semibold text-[var(--primary)] dark:text-[#7FA3FF]">
-                  {photo.category}
-                </span>
-              </div>
-              <div className="mt-4 px-1">
-                <h4 className="text-sm font-bold text-[var(--text)]">{photo.title}</h4>
-                <p className="mt-1 line-clamp-2 text-xs text-[var(--text-muted)]">
-                  {photo.caption}
-                </p>
-              </div>
-            </motion.div>
-          ))}
+        <div className="pt-2">
+          <PhotoMarquee photos={CREATIVE_CONTENT.photos} />
         </div>
 
         <div className="grid gap-6 pt-4 md:grid-cols-2">

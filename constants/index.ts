@@ -116,7 +116,8 @@ export interface CreativeVideo {
   duration: string
   description: string
   tools: string[]
-  link: string
+  url: string
+  poster: string
 }
 
 export interface CreativeContent {
@@ -620,7 +621,8 @@ export const CREATIVE_CONTENT: CreativeContent = {
       duration: "02:15",
       description: "Mini video esai tentang alur perancangan antarmuka pengguna dari wireframe kasar hingga prototipe final.",
       tools: ["Premiere Pro", "After Effects"],
-      link: "#",
+      url: "https://www.youtube.com/watch?v=VIDEO_ID",
+      poster: "",
     },
     {
       id: "video-2",
@@ -629,7 +631,8 @@ export const CREATIVE_CONTENT: CreativeContent = {
       duration: "01:45",
       description: "Video rangkuman dinamis yang menampilkan karya teknologi mahasiswa di pameran inovasi.",
       tools: ["DaVinci Resolve", "Sony Alpha"],
-      link: "#",
+      url: "https://vimeo.com/VIDEO_ID",
+      poster: "",
     },
   ],
 }
